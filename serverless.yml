@@ -1,0 +1,67 @@
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+service: comtac-express-app
+
+custom:
+  defaultStage: dev
+  defaultRegion: us-west-2
+  profiles:
+    dev: dev
+    prod: comtac
+  tableName: "evolutions-table-${self:provider.stage}"
+  dynamodb:
+    start:
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: ${opt:stage, self:custom.defaultStage}
+  profile: ${self:custom.profiles.${self:provider.stage}}
+  region: ${opt:stage, self:custom.defaultRegion}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["EvolutionsDynamoDBTable", "Arn"] }
+  environment:
+    EVOLUTIONS_TABLE: ${self:custom.tableName}
+
+functions:
+  app:
+    handler: index.handler
+    events:
+      - http: ANY /
+      - http: "ANY {proxy+}"
+  getEvolution:
+    handler: index.handler
+    events:
+      - http: "GET /evolutions/{proxy+}"
+  createEvolution:
+    handler: index.handler
+    events:
+      - http: "POST /evolutions"
+
+resources:
+  Resources:
+    EvolutionsDynamoDBTable:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: evolutionId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: evolutionId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:custom.tableName}
