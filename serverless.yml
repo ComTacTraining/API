@@ -9,7 +9,7 @@ custom:
   defaultRegion: us-west-2
   profiles:
     dev: dev
-    prod: comtac
+    production: comtac
   tableName: "evolutions-table-${self:provider.stage}"
   dynamodb:
     start:
