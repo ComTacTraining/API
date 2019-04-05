@@ -1,18 +1,22 @@
+service: api
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
-
-service: comtac-express-app
 
 custom:
   defaultStage: dev
   defaultRegion: us-west-2
   profiles:
     dev: dev
-    production: comtac
-  tableName: "evolutions-table-${self:provider.stage}"
+    prod: prod
+  tableName: "comtac-${self:provider.stage}"
   dynamodb:
     start:
+      port: 8000
+      inMemory: true
       migrate: true
 
 provider:
@@ -20,7 +24,9 @@ provider:
   runtime: nodejs8.10
   stage: ${opt:stage, self:custom.defaultStage}
   profile: ${self:custom.profiles.${self:provider.stage}}
-  region: ${opt:stage, self:custom.defaultRegion}
+  region: ${opt:region, self:custom.defaultRegion}
+  environment:
+    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -31,37 +37,25 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["EvolutionsDynamoDBTable", "Arn"] }
-  environment:
-    EVOLUTIONS_TABLE: ${self:custom.tableName}
-
-functions:
-  app:
-    handler: index.handler
-    events:
-      - http: ANY /
-      - http: "ANY {proxy+}"
-  getEvolution:
-    handler: index.handler
-    events:
-      - http: "GET /evolutions/{proxy+}"
-  createEvolution:
-    handler: index.handler
-    events:
-      - http: "POST /evolutions"
+        - { "Fn::GetAtt": ["DynamoDbTable", "Arn"] }
+  
+${file(evolution/serverless.yml)}
 
 resources:
   Resources:
-    EvolutionsDynamoDBTable:
+    EvolutionsDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
+      DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          - AttributeName: evolutionId
+          - 
+            AttributeName: id
             AttributeType: S
         KeySchema:
-          - AttributeName: evolutionId
+          - 
+            AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:custom.tableName}
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}

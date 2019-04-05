@@ -19,6 +19,7 @@ npm install
 Start a local server for testing purposes
 
 ```
+npm install -g serverless
 sls dynamodb install
 sls offline start
 export BASE_DOMAIN=http://localhost:3000
