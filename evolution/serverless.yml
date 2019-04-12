@@ -1,44 +1,20 @@
-service: api-evolution
-
-frameworkVersion: ">=1.1.0 <2.0.0"
-
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
-
-functions:
   create:
-    handler: create.create
+    handler: evolution/create.create
     events:
-      - http:
-        path: evolutions
-        method: post
-        cors: true 
+      - http: 'POST /evolutions'
   list:
-    handler: list.list
+    handler: evolution/list.list
     events:
-      - http:
-        path: evolutions
-        method: get
-        cors: true
+      - http: 'GET /evolutions'
   read:
-    handler: read.read
+    handler: evolution/read.read
     events:
-      - http:
-          path: evolutions/{id}
-          method: get,
-          cors: true
+      - http: 'GET evolutions/{id}'
   update:
-    handler: update.update
+    handler: evolution/update.update
     events:
-      - http:
-        path: evolutions/{id}
-        method: put
-        cors: true
+      - http: 'PUT evolutions/{id}'
   delete:
-    handler: delete.delete
+    handler: evolution/delete.delete
     events:
-      - http:
-        path: evolutions/{id}
-        method: delete
-        cors: true
+      - http: DELETE evolutions/{id}

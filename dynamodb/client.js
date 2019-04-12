@@ -1,6 +1,4 @@
-'use strict';
-
-const AWS = require("aws-sdk");
+const AWS = require('aws-sdk');
 
 let options = {};
 
@@ -10,6 +8,7 @@ if (process.env.IS_OFFLINE) {
     endpoint: "http://localhost:8000"
   }
 }
+
 const client = new AWS.DynamoDB.DocumentClient(options);
 
-module.export = client;
+module.exports = client;

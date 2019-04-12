@@ -39,7 +39,8 @@ provider:
       Resource:
         - { "Fn::GetAtt": ["DynamoDbTable", "Arn"] }
   
-${file(evolution/serverless.yml)}
+functions: 
+  ${file(evolution/serverless.yml)}
 
 resources:
   Resources:
