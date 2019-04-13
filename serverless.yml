@@ -37,7 +37,7 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["DynamoDbTable", "Arn"] }
+        - { "Fn::GetAtt": ["EvolutionsDynamoDbTable", "Arn"] }
   
 functions: 
   ${file(evolution/serverless.yml)}
