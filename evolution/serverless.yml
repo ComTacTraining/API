@@ -2,19 +2,24 @@
     handler: evolution/create.create
     events:
       - http: 'POST /evolutions'
+        cors: true
   list:
     handler: evolution/list.list
     events:
       - http: 'GET /evolutions'
+        cors: true
   read:
     handler: evolution/read.read
     events:
       - http: 'GET evolutions/{id}'
+        cors: true
   update:
     handler: evolution/update.update
     events:
       - http: 'PUT evolutions/{id}'
+        cors: true
   delete:
     handler: evolution/delete.delete
     events:
       - http: DELETE evolutions/{id}
+        cors: true

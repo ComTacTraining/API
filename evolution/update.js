@@ -1,8 +1,10 @@
 'use strict';
 
 const dynamodb = require('../dynamodb/client');
+const middy = require('middy');
+const { cors } = require('middy/middlewares');
 
-module.exports.update = (event, context, callback) => {
+const update = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const data = JSON.parse(event.body);
   
@@ -89,3 +91,8 @@ module.exports.update = (event, context, callback) => {
     callback(null, response);
   });
 };
+
+const handler = middy(update)
+  .use(cors());
+
+module.exports.update = handler;

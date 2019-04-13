@@ -1,8 +1,10 @@
 'use strict';
 
 const dynamodb = require('../dynamodb/client');
+const middy = require('middy');
+const { cors } = require('middy/middlewares');
 
-module.exports.delete = (event, context, callback) => {
+const delete = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
@@ -28,3 +30,8 @@ module.exports.delete = (event, context, callback) => {
     callback(null, response);
   });
 };
+
+const handler = middy(delete)
+  .use(cors());
+
+module.exports.delete = handler;
