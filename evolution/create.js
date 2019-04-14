@@ -2,10 +2,11 @@
 
 const uuid = require('uuid');
 const dynamodb = require('../dynamodb/client');
-const middy = require('middy');
-const { cors } = require('middy/middlewares');
+//const middy = require('middy');
+//const { cors } = require('middy/middlewares');
 
-const create = (event, context, callback) => {
+//const create = (event, context, callback) => {
+module.exports.create = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const data = JSON.parse(event.body);
   
@@ -84,13 +85,18 @@ const create = (event, context, callback) => {
 
     const response = {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify(params.Item),
     };
     callback(null, response);
   });
 };
 
-const handler = middy(create)
+/*const handler = middy(create)
   .use(cors());
 
-module.exports.create = handler;
+module.exports.create = handler;*/

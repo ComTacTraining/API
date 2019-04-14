@@ -1,10 +1,11 @@
 'use strict';
 
 const dynamodb = require('../dynamodb/client');
-const middy = require('middy');
-const { cors } = require('middy/middlewares');
+//const middy = require('middy');
+//const { cors } = require('middy/middlewares');
 
-const update = (event, context, callback) => {
+//const update = (event, context, callback) => {
+  module.exports.update = (event, context, callback) => {
   const timestamp = new Date().getTime();
   const data = JSON.parse(event.body);
   
@@ -86,13 +87,18 @@ const update = (event, context, callback) => {
 
     const response = {
       statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify(result.Attributes),
     };
     callback(null, response);
   });
 };
 
-const handler = middy(update)
+/*const handler = middy(update)
   .use(cors());
 
-module.exports.update = handler;
+module.exports.update = handler;*/
