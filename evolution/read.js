@@ -1,10 +1,7 @@
 'use strict';
 
 const dynamodb = require('../dynamodb/client');
-//const middy = require('middy');
-//const { cors } = require('middy/middlewares');
 
-//const read = (event, context, callback) => {
 module.exports.read = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
@@ -31,8 +28,3 @@ module.exports.read = (event, context, callback) => {
     callback(null, response);
   });
 };
-
-/*const handler = middy(read)
-  .use(cors());
-
-module.exports.read = handler;*/

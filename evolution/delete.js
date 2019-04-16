@@ -1,10 +1,7 @@
 'use strict';
 
 const dynamodb = require('../dynamodb/client');
-//const middy = require('middy');
-//const { cors } = require('middy/middlewares');
 
-//const delete = (event, context, callback) => {
 module.exports.delete = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
@@ -26,11 +23,6 @@ module.exports.delete = (event, context, callback) => {
 
     const response = {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-      },
       body: JSON.stringify({}),
     };
     callback(null, response);
