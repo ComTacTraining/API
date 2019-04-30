@@ -20,15 +20,16 @@ module.exports.create = (event, context, callback) => {
     typeof data.placement !== 'string' ||
     typeof data.side !== 'string' ||
     typeof data.flowpath !== 'string' ||
+    typeof data.fireType !== 'string' ||
     typeof data.exhaustPath !== 'string' ||
-    typeof data.smokeConditions !== 'string' ||
-    typeof data.smokeColor !== 'string' ||
-    typeof data.intro !== 'string' ||
+    typeof data.smoke !== 'string' ||
     typeof data.approach !== 'string' ||
+    typeof data.intro !== 'string' ||
     typeof data.alpha !== 'string' ||
     typeof data.bravo !== 'string' ||
     typeof data.charlie !== 'string' ||
-    typeof data.delta !== 'string') {
+    typeof data.delta !== 'string' ||
+    typeof data.loop !== 'string') {
 
     console.error('Validation Failure');
     callback(null, {
@@ -42,7 +43,9 @@ module.exports.create = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Item: {
-      id: uuid.v1(),
+      pk: uuid.v1(),
+      sk: 'EVOLUTION',
+      data: data.category,
       category: data.category,
       construction: data.construction,
       street: data.street,
@@ -55,15 +58,16 @@ module.exports.create = (event, context, callback) => {
       placement: data.placement,
       side: data.side,
       flowpath: data.flowpath,
+      fireType: data.fireType,
       exhaustPath: data.exhaustPath,
-      smokeConditions: data.smokeConditions,
-      smokeColor: data.smokeColor,
-      intro: data.intro,
+      smoke: data.smoke,
       approach: data.approach,
+      intro: data.intro,
       alpha: data.alpha,
       bravo: data.bravo,
       charlie: data.charlie,
       delta: data.delta,
+      loop: data.loop,
       createdAt: timestamp,
       updatedAt: timestamp,
     },

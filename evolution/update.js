@@ -18,15 +18,16 @@ const dynamodb = require('../dynamodb/client');
     typeof data.placement !== 'string' ||
     typeof data.side !== 'string' ||
     typeof data.flowpath !== 'string' ||
+    typeof data.fireType !== 'string' ||
     typeof data.exhaustPath !== 'string' ||
-    typeof data.smokeConditions !== 'string' ||
-    typeof data.smokeColor !== 'string' ||
+    typeof data.smoke !== 'string' ||
     typeof data.intro !== 'string' ||
     typeof data.approach !== 'string' ||
     typeof data.alpha !== 'string' ||
     typeof data.bravo !== 'string' ||
     typeof data.charlie !== 'string' ||
-    typeof data.delta !== 'string') {
+    typeof data.delta !== 'string' ||
+    typeof data.loop !== 'string') {
 
     console.error('Validation Failure');
     callback(null, {
@@ -40,9 +41,15 @@ const dynamodb = require('../dynamodb/client');
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-        id: event.pathParameters.id,
+        pk: event.pathParameters.id,
+        sk: 'EVOLUTION'
+    },
+    ExpressionAttributeNames: {
+      '#data': 'data',
+      '#loop': 'loop',
     },
     ExpressionAttributeValues: {
+        ':data': data.category,
         ':category': data.category,
         ':construction': data.construction,
         ':street': data.street,
@@ -55,18 +62,19 @@ const dynamodb = require('../dynamodb/client');
         ':placement': data.placement,
         ':side': data.side,
         ':flowpath': data.flowpath,
+        ':fireType': data.fireType,
         ':exhaustPath': data.exhaustPath,
-        ':smokeConditions': data.smokeConditions,
-        ':smokeColor': data.smokeColor,
-        ':intro': data.intro,
+        ':smoke': data.smoke,
         ':approach': data.approach,
+        ':intro': data.intro,
         ':alpha': data.alpha,
         ':bravo': data.bravo,
         ':charlie': data.charlie,
         ':delta': data.delta,
+        ':loop': data.loop,
         ':updatedAt': timestamp,
     },
-    UpdateExpression: 'SET category = :category, construction = :construction, street = :street, size = :size, height = :height, occupancyType = :occupancyType, witnessedConditions = :witnessedConditions, entryEgress = :entryEgress, survivabilityProfile = :survivabilityProfile, placement = :placement, side = :side, flowpath = :flowpath, exhaustPath = :exhaustPath, smokeConditions = :smokeConditions, smokeColor = :smokeColor, intro = :intro, approach = :approach, alpha = :alpha, bravo = :bravo, charlie = :charlie, delta = :delta, updatedAt = :updatedAt',
+    UpdateExpression: 'SET #data = :data, category = :category, construction = :construction, street = :street, size = :size, height = :height, occupancyType = :occupancyType, witnessedConditions = :witnessedConditions, entryEgress = :entryEgress, survivabilityProfile = :survivabilityProfile, placement = :placement, side = :side, flowpath = :flowpath, firetype = :fireType, exhaustPath = :exhaustPath, smoke = :smoke, approach = :approach, intro = :intro, alpha = :alpha, bravo = :bravo, charlie = :charlie, delta = :delta, #loop = :loop, updatedAt = :updatedAt',
     ReturnValues: 'ALL_NEW',
   };
 

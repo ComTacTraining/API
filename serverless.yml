@@ -1,4 +1,4 @@
-service: api
+service: comtac
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 
@@ -12,7 +12,7 @@ custom:
   profiles:
     dev: dev
     prod: prod
-  tableName: "comtac-${self:provider.stage}"
+  tableName: ${self:service}-${self:provider.stage}
   dynamodb:
     start:
       port: 8000
@@ -37,26 +37,37 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
       Resource:
-        - { "Fn::GetAtt": ["EvolutionsDynamoDbTable", "Arn"] }
+        - { "Fn::GetAtt": ["ComtacDynamoDbTable", "Arn"] }
   
 functions: 
   ${file(evolution/serverless.yml)}
 
 resources:
   Resources:
-    EvolutionsDynamoDbTable:
+    ComtacDynamoDbTable:
       Type: "AWS::DynamoDB::Table"
       DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
-          - 
-            AttributeName: id
-            AttributeType: S
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+        - AttributeName: data
+          AttributeType: S
         KeySchema:
-          - 
-            AttributeName: id
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+        GlobalSecondaryIndexes:
+        - IndexName: gsi_1
+          KeySchema:
+          - AttributeName: sk
             KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          - AttributeName: data
+            KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
         TableName: ${self:provider.environment.DYNAMODB_TABLE}

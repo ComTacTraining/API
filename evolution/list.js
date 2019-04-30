@@ -5,9 +5,14 @@ const dynamodb = require('../dynamodb/client');
 module.exports.list = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
+    IndexName: 'gsi_1',
+    KeyConditionExpression: 'sk = :evolution',
+    ExpressionAttributeValues: {
+      ':evolution': 'EVOLUTION',
+    }
   };
 
-  dynamodb.scan(params, (error, result) => {
+  dynamodb.query(params, (error, result) => {
     if (error) {
       console.error(error);
       callback(null, {

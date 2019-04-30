@@ -6,7 +6,8 @@ module.exports.read = (event, context, callback) => {
   const params = {
     TableName: process.env.DYNAMODB_TABLE,
     Key: {
-        id: event.pathParameters.id,
+      pk: event.pathParameters.id,
+      sk: 'EVOLUTION',
     }
   };
 
