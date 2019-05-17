@@ -23,7 +23,7 @@ custom:
       domain:
         sources:
           - table: ${self:service}-${self:provider.stage}
-            sources: [./dynamodb/evolutionCL.json, ./dynamodb/evolutionIL.json]
+            sources: [./dynamodb/evolutionsCL.json, ./dynamodb/evolutionsCM.json, ./dynamodb/evolutionsIL.json, ./dynamodb/evolutionsIM.json, , ./dynamodb/evolutionsMFL.json, ./dynamodb/evolutionsMFM.json, ./dynamodb/evolutionsSFL.json, ./dynamodb/evolutionsSFM.json]
 
 provider:
   name: aws
