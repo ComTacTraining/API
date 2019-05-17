@@ -5,7 +5,6 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
-  - serverless-dynamodb-fixtures-plugin
 
 custom:
   defaultStage: dev
@@ -19,6 +18,12 @@ custom:
       port: 8000
       inMemory: true
       migrate: true
+      seed: true
+    seed:
+      domain:
+        sources:
+          - table: ${self:service}-${self:provider.stage}
+            sources: [./dynamodb/evolutionCL.json, ./dynamodb/evolutionIL.json]
 
 provider:
   name: aws
