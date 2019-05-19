@@ -13,11 +13,12 @@
     "aws-sdk": "^2.403.0",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "serverless-dynamodb-local": "^0.2.37",
     "serverless-http": "^1.9.0",
+    "serverless-plugin-scripts": "^1.0.2",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "serverless-dynamodb-local": "^0.2.37",
     "serverless-offline": "^4.2.0"
   }
 }

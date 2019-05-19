@@ -5,25 +5,7 @@ frameworkVersion: ">=1.1.0 <2.0.0"
 plugins:
   - serverless-dynamodb-local
   - serverless-offline
-
-custom:
-  defaultStage: dev
-  defaultRegion: us-west-2
-  profiles:
-    dev: dev
-    prod: prod
-  tableName: ${self:service}-${self:provider.stage}
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-      seed: true
-    seed:
-      domain:
-        sources:
-          - table: ${self:service}-${self:provider.stage}
-            sources: [./dynamodb/evolutionsCL.json, ./dynamodb/evolutionsCM.json, ./dynamodb/evolutionsIL.json, ./dynamodb/evolutionsIM.json, , ./dynamodb/evolutionsMFL.json, ./dynamodb/evolutionsMFM.json, ./dynamodb/evolutionsSFL.json, ./dynamodb/evolutionsSFM.json]
+  - serverless-plugin-scripts
 
 provider:
   name: aws
@@ -44,9 +26,72 @@ provider:
         - dynamodb:DeleteItem
       Resource:
         - { "Fn::GetAtt": ["ComtacDynamoDbTable", "Arn"] }
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource:
+        - { "Fn::Join": [ "/", [
+            { "Fn::GetAtt": ["ComtacDynamoDbTable", "Arn"] }, "index", "gsi_1"
+          ]]}
+
+custom:
+  defaultStage: dev
+  defaultRegion: us-west-2
+  profiles:
+    dev: dev
+    prod: prod
+  tableName: ${self:service}-${self:provider.stage}
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+      seed: true
+    seed:
+      comtac:
+        sources:
+          - table: ${self:service}-${self:provider.stage}
+            sources: [./dynamodb/evolutionsCL.json, ./dynamodb/evolutionsCM.json, ./dynamodb/evolutionsIL.json, ./dynamodb/evolutionsIM.json, ./dynamodb/evolutionsMFL.json, ./dynamodb/evolutionsMFM.json, ./dynamodb/evolutionsSFL.json, ./dynamodb/evolutionsSFM.json]
+  serverless-offline:
+    port: 3001
   
 functions: 
-  ${file(evolution/serverless.yml)}
+  create:
+    handler: evolution/create.create
+    events:
+      - http:
+          path: evolutions
+          method: post
+          cors: true
+  list:
+    handler: evolution/list.list
+    events:
+      - http:
+          path: evolutions
+          method: get
+          cors: true
+  read:
+    handler: evolution/read.read
+    events:
+      - http:
+          path: evolutions/{id}
+          method: get
+          cors: true
+  update:
+    handler: evolution/update.update
+    events:
+      - http:
+          path: evolutions/{id}
+          method: put
+          cors: true
+  delete:
+    handler: evolution/delete.delete
+    events:
+      - http:
+          path: evolutions/{id}
+          method: delete
+          cors: true
 
 resources:
   Resources:

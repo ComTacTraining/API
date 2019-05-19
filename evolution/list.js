@@ -9,7 +9,11 @@ module.exports.list = (event, context, callback) => {
     KeyConditionExpression: 'sk = :evolution',
     ExpressionAttributeValues: {
       ':evolution': 'EVOLUTION',
-    }
+    },
+    ExpressionAttributeNames: {
+      '#data': 'data',
+    },
+    ProjectionExpression: 'pk, #data, street'
   };
 
   dynamodb.query(params, (error, result) => {
