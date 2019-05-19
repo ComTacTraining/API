@@ -10,10 +10,10 @@ module.exports.list = (event, context, callback) => {
     ExpressionAttributeValues: {
       ':evolution': 'EVOLUTION',
     },
-    ExpressionAttributeNames: {
+    /*ExpressionAttributeNames: {
       '#data': 'data',
-    },
-    ProjectionExpression: 'pk, #data, street'
+    },*/
+    ProjectionExpression: 'pk, category, street'
   };
 
   dynamodb.query(params, (error, result) => {
