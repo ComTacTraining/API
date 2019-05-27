@@ -6,6 +6,7 @@ plugins:
   - serverless-dynamodb-local
   - serverless-offline
   - serverless-plugin-scripts
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
@@ -57,13 +58,13 @@ custom:
     port: 3001
   
 functions: 
-  create:
-    handler: evolution/create.create
-    events:
-      - http:
-          path: evolutions
-          method: post
-          cors: true
+#  create:
+#    handler: evolution/create.create
+#    events:
+#      - http:
+#          path: evolutions
+#          method: post
+#          cors: true
   list:
     handler: evolution/list.list
     events:
@@ -78,20 +79,28 @@ functions:
           path: evolutions/{id}
           method: get
           cors: true
-  update:
-    handler: evolution/update.update
+#  update:
+#    handler: evolution/update.update
+#    events:
+#      - http:
+#          path: evolutions/{id}
+#          method: put
+#          cors: true
+#  delete:
+#    handler: evolution/delete.delete
+#    events:
+#      - http:
+#          path: evolutions/{id}
+#          method: delete
+#          cors: true
+  speech:
+    handler: speech/token.token
     events:
       - http:
-          path: evolutions/{id}
-          method: put
+          path: speech
+          method: post
           cors: true
-  delete:
-    handler: evolution/delete.delete
-    events:
-      - http:
-          path: evolutions/{id}
-          method: delete
-          cors: true
+          
 
 resources:
   Resources:
