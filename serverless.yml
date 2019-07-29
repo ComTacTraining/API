@@ -1,49 +1,23 @@
 service: comtac
 
-frameworkVersion: ">=1.1.0 <2.0.0"
+package:
+  individually: true
 
 plugins:
+  - serverless-bundle
   - serverless-dynamodb-local
   - serverless-offline
-  - serverless-plugin-scripts
   - serverless-dotenv-plugin
 
-provider:
-  name: aws
-  runtime: nodejs8.10
-  stage: ${opt:stage, self:custom.defaultStage}
-  profile: ${self:custom.profiles.${self:provider.stage}}
-  region: ${opt:region, self:custom.defaultRegion}
-  environment:
-    DYNAMODB_TABLE: ${self:service}-${self:provider.stage}
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource:
-        - { "Fn::GetAtt": ["ComtacDynamoDbTable", "Arn"] }
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-      Resource:
-        - { "Fn::Join": [ "/", [
-            { "Fn::GetAtt": ["ComtacDynamoDbTable", "Arn"] }, "index", "gsi_1"
-          ]]}
-
 custom:
-  defaultStage: dev
-  defaultRegion: us-west-2
+  stage: ${opt:stage, self:provider.stage}
   profiles:
     dev: dev
     prod: prod
-  tableName: ${self:service}-${self:provider.stage}
+  tableName: ${self:service}-${self:custom.stage}
   dynamodb:
+    stages:
+      - dev
     start:
       port: 8000
       inMemory: true
@@ -53,81 +27,84 @@ custom:
       comtac:
         sources:
           - table: ${self:service}-${self:provider.stage}
-            sources: [./dynamodb/evolutionsCL.json, ./dynamodb/evolutionsCM.json, ./dynamodb/evolutionsIL.json, ./dynamodb/evolutionsIM.json, ./dynamodb/evolutionsMFL.json, ./dynamodb/evolutionsMFM.json, ./dynamodb/evolutionsSFL.json, ./dynamodb/evolutionsSFM.json]
+            sources: [./import/evolutionsCL.json, ./import/evolutionsCM.json, ./import/evolutionsIL.json, ./import/evolutionsIM.json, ./import/evolutionsMFL.json, ./import/evolutionsMFM.json, ./import/evolutionsSFL.json, ./import/evolutionsSFM.json]
   serverless-offline:
     port: 3001
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  stage: dev
+  profile: ${self:custom.profiles.${self:custom.stage}}
+  region: us-west-2
+  environment:
+    tableName: ${self:service}-${self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - { "Fn::GetAtt": ["ComtacTable", "Arn"] }
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource:
+        - { "Fn::Join": [ "/", [
+            { "Fn::GetAtt": ["ComtacTable", "Arn"] }, "index", "gsi_1"
+          ]]}
   
 functions: 
-#  create:
-#    handler: evolution/create.create
-#    events:
-#      - http:
-#          path: evolutions
-#          method: post
-#          cors: true
-  list:
-    handler: evolution/list.list
+  evolutionsList:
+    handler: evolutions/list.main
     events:
       - http:
           path: evolutions
           method: get
           cors: true
-  read:
-    handler: evolution/read.read
+  evolutionsRead:
+    handler: evolutions/read.main
     events:
       - http:
           path: evolutions/{id}
           method: get
           cors: true
-#  update:
-#    handler: evolution/update.update
-#    events:
-#      - http:
-#          path: evolutions/{id}
-#          method: put
-#          cors: true
-#  delete:
-#    handler: evolution/delete.delete
-#    events:
-#      - http:
-#          path: evolutions/{id}
-#          method: delete
-#          cors: true
-  speech:
-    handler: speech/token.token
-    events:
+  alarmsCreate:
+    handler: alarms/create.main
+    events: 
       - http:
-          path: speech
+          path: alarms
           method: post
           cors: true
-          
+          authorizer: aws_iam
+  alarmsRead:
+    handler: alarms/read.main
+    events:
+      - http:
+          path: alarms/{id}
+          method: get
+          cors: true
+          authorizer: aws_iam
+  alarmsUpdate:
+    handler: alarms/update.main
+    events:
+      - http:
+          path: alarms/{id}
+          method: put
+          cors: true
+          authorizer: aws_iam
 
 resources:
-  Resources:
-    ComtacDynamoDbTable:
-      Type: "AWS::DynamoDB::Table"
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-        - AttributeName: pk
-          AttributeType: S
-        - AttributeName: sk
-          AttributeType: S
-        - AttributeName: data
-          AttributeType: S
-        KeySchema:
-        - AttributeName: pk
-          KeyType: HASH
-        - AttributeName: sk
-          KeyType: RANGE
-        GlobalSecondaryIndexes:
-        - IndexName: gsi_1
-          KeySchema:
-          - AttributeName: sk
-            KeyType: HASH
-          - AttributeName: data
-            KeyType: RANGE
-          Projection:
-            ProjectionType: ALL
-        BillingMode: PAY_PER_REQUEST
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+  # API Gateway Errors
+  - ${file(resources/api-gateway-errors.yml)}
+  # DynamoDB
+  - ${file(resources/dynamodb-table.yml)}
+  # Cognito
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}
