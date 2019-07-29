@@ -18,6 +18,7 @@ custom:
   dynamodb:
     stages:
       - dev
+      - prod
     start:
       port: 8000
       inMemory: true
@@ -34,11 +35,11 @@ custom:
 provider:
   name: aws
   runtime: nodejs8.10
-  stage: dev
+  stage: prod
   profile: ${self:custom.profiles.${self:custom.stage}}
   region: us-west-2
   environment:
-    tableName: ${self:service}-${self:provider.stage}
+    tableName: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
