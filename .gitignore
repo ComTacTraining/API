@@ -1,5 +1,7 @@
 .DS_Store
 .serverless
+.webpack
+.dynamodb
 __test__
 coverage
 node_modules

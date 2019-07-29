@@ -3,7 +3,7 @@ Resources:
     Type: "AWS::DynamoDB::Table"
     DeletionPolicy: Retain
     Properties:
-      TableName: ${self:provider.environment.DYNAMODB_TABLE}
+      TableName: ${self:provider.environment.tableName}
       AttributeDefinitions:
       - AttributeName: pk
         AttributeType: S
