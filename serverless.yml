@@ -88,7 +88,7 @@ functions:
     handler: alarms/read.main
     events:
       - http:
-          path: alarms/{id}
+          path: alarms
           method: get
           cors: true
           authorizer: aws_iam
@@ -96,8 +96,54 @@ functions:
     handler: alarms/update.main
     events:
       - http:
-          path: alarms/{id}
+          path: alarms
           method: put
+          cors: true
+          authorizer: aws_iam
+  billingProducts:
+    handler: billing/products.main
+    events:
+      - http:
+          path: billing/products
+          method: get
+          cors: true
+  billingPlans:
+    handler: billing/plans.main
+    events:
+      - http:
+          path: billing/plans
+          method: get
+          cors: true
+  billingCustomers:
+    handler: billing/customers.main
+    events:
+      - http:
+          path: billing/customers
+          method: post
+          cors: true
+          authorizer: aws_iam
+  billingSubscriptions:
+    handler: billing/subscriptions.main
+    events:
+      - http:
+          path: billing/subscriptions
+          method: post
+          cors: true
+          authorizer: aws_iam
+  billingSubscription:
+    handler: billing/subscription.main
+    events:
+      - http:
+          path: billing/subscription
+          method: get
+          cors: true
+          authorizer: aws_iam
+  billingCancel:
+    handler: billing/cancel.main
+    events:
+      - http:
+          path: billing/cancel
+          method: post
           cors: true
           authorizer: aws_iam
 
