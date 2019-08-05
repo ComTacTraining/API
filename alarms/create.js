@@ -13,7 +13,7 @@ export async function main(event, context) {
       alarm1: data.alarm1,
       alarm2: data.alarm2,
       alarm3: data.alarm3,
-      dispatcher: data.dispatcher,
+      dispatchCenter: data.dispatchCenter,
       createdAt: timestamp,
       updatedAt: timestamp
     }

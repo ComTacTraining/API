@@ -11,12 +11,12 @@ export async function main(event, context) {
       sk: 'ALARMS'
     },
     UpdateExpression:
-      'SET alarm1 = :alarm1, alarm2 = :alarm2, alarm3 = :alarm3, dispatcher = :dispatcher, updatedAt = :updatedAt',
+      'SET alarm1 = :alarm1, alarm2 = :alarm2, alarm3 = :alarm3, dispatchCenter = :dispatchCenter, updatedAt = :updatedAt',
     ExpressionAttributeValues: {
       ':alarm1': data.alarm1 || null,
       ':alarm2': data.alarm2 || null,
       ':alarm3': data.alarm3 || null,
-      ':dispatcher': data.dispatcher || null,
+      ':dispatchCenter': data.dispatchCenter || null,
       ':updatedAt': timestamp
     },
     ReturnValues: 'ALL_NEW'
